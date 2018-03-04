@@ -1,10 +1,3 @@
-/*var builder = require('botbuilder');
-
-var connector = new builder.ConsoleConnector().listen();
-var bot = new builder.UniversalBot(connector, function (session) {
-    session.send("You said: %s", session.message.text);
-}); */
-
 var restify = require('restify');
 var builder = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
@@ -45,32 +38,32 @@ var intents = new builder.IntentDialog({ recognizers: [recognizer] })
 .matches('AttendHackathon', (session) => {
     const possibleResponses = ["Nice to see that you love hackathons. Could you describe one of the projects you like the best?"];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 })
 .matches('Collaborate', (session) => {
 	const possibleResponses = ["Sounds good. So in terms of collaboration, have you been faced with a difficult situation in a team? How did you deal with that?"];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 })
 .matches('Intern', (session) => {
 	const possibleResponses = ["Can you tell me more about the intern project you just mentioned? What did you enjoy most about it?"];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 })
 .matches('Leadership', (session) => {
 	const possibleResponses = ["I see that you have a decent amount of leadership experience. Do you like to work in a team as a leader or as a member? Why?"];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 })
 .matches('MachineLearning', (session) => {
 	const possibleResponses = ["So you know about machine learning? What are some of the projects you have completed using machine learning?"];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 })
 .onDefault((session) => {
 	const possibleResponses = ["Nice!", "Good.", "Good job."];
     const rand = Math.floor(Math.rand() * possibleResponses);
-    session.send(possibleResponses[rand], session.message.text);
+    session.send(possibleResponses[rand]);
 });
 
 bot.dialog('/', intents);
