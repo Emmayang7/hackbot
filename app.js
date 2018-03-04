@@ -7,6 +7,7 @@ var bot = new builder.UniversalBot(connector, function (session) {
 
 var restify = require('restify');
 var builder = require('botbuilder');
+var botbuilder_azure = require("botbuilder-azure");
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -23,7 +24,53 @@ var connector = new builder.ChatConnector({
 // Listen for messages from users 
 server.post('/api/messages', connector.listen());
 
-// Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
-var bot = new builder.UniversalBot(connector, function (session) {
-    session.send("You just said: %s", session.message.text);
+var tableName = 'botdata';
+var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
+var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
+
+// Create your bot with a function to receive messages from the user
+var bot = new builder.UniversalBot(connector, function (session, args) {
+    session.send('default', session.message.text);
 });
+bot.set('storage', tableStorage);
+var luisAppId = process.env.LuisAppId;
+var luisAPIKey = process.env.LuisAPIKey;
+var luisAPIHostName = process.env.LuisAPIHostName;
+
+const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisAppId + '?subscription-key=' + luisAPIKey;
+
+// Main dialog with LUIS
+var recognizer = new builder.LuisRecognizer(LuisModelUrl);
+var intents = new builder.IntentDialog({ recognizers: [recognizer] })
+.matches('AttendHackathon', (session) => {
+    const possibleResponses = ["Nice to see that you love hackathons. Could you describe one of the projects you like the best?"];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+})
+.matches('Collaborate', (session) => {
+	const possibleResponses = ["Sounds good. So in terms of collaboration, have you been faced with a difficult situation in a team? How did you deal with that?"];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+})
+.matches('Intern', (session) => {
+	const possibleResponses = ["Can you tell me more about the intern project you just mentioned? What did you enjoy most about it?"];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+})
+.matches('Leadership', (session) => {
+	const possibleResponses = ["I see that you have a decent amount of leadership experience. Do you like to work in a team as a leader or as a member? Why?"];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+})
+.matches('MachineLearning', (session) => {
+	const possibleResponses = ["So you know about machine learning? What are some of the projects you have completed using machine learning?"];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+})
+.onDefault((session) => {
+	const possibleResponses = ["Nice!", "Good.", "Good job."];
+    const rand = Math.floor(Math.rand() * possibleResponses);
+    session.send(possibleResponses[rand], session.message.text);
+});
+
+bot.dialog('/', intents);
